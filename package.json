@@ -1,0 +1,28 @@
+{
+  "name": "sbtechbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AuctechMarcomWeb/SBTechBackend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AuctechMarcomWeb/SBTechBackend/issues"
+  },
+  "homepage": "https://github.com/AuctechMarcomWeb/SBTechBackend#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemailer": "^9.0.5"
+  }
+}
