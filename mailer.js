@@ -1,25 +1,16 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host:   process.env.SMTP_HOST,    // smtp.hostinger.com
-  port:   Number(process.env.SMTP_PORT),  // 465
-  secure: process.env.SMTP_SECURE === 'true', // true for port 465
+  host:   process.env.SMTP_HOST || 'smtp.hostinger.com',
+  port:   Number(process.env.SMTP_PORT) || 465,
+  secure: process.env.SMTP_SECURE !== 'false',
   auth: {
-    user: process.env.EMAIL_USER,   // your@yourdomain.com
-    pass: process.env.EMAIL_PASS,   // Hostinger email password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false,      // Hostinger SSL compatibility
+    rejectUnauthorized: false,
   },
-});
-
-// Connection verify on startup
-transporter.verify((err, success) => {
-  if (err) {
-    console.error('❌ Mailer connection failed:', err.message);
-  } else {
-    console.log('✅ Mailer connected — ready to send emails');
-  }
 });
 
 /**
