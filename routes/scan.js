@@ -1,13 +1,11 @@
-const express = require('express');
-const router  = express.Router();
-const { sendMail } = require('../mailer');
-const { scanAlertToSBTech } = require('../templates/scanAlert');
+import express from 'express';
+import { sendMail } from '../mailer.js';
+import { scanAlertToSBTech } from '../templates/scanAlert.js';
 
-/**
- * POST /api/scan-alert
- * Body: { domain, risk, findings[] }
- * → SBTech ko email bhejta hai jab koi scan kare
- */
+const router = express.Router();
+
+// POST /api/scan-alert
+// → SBTech ko email jab koi scan kare
 router.post('/scan-alert', async (req, res) => {
   try {
     const { domain, risk, findings } = req.body;
@@ -29,4 +27,4 @@ router.post('/scan-alert', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

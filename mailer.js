@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host:   process.env.SMTP_HOST || 'smtp.hostinger.com',
@@ -13,10 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * sendMail({ to, subject, html })
- */
-async function sendMail({ to, subject, html }) {
+export async function sendMail({ to, subject, html }) {
   return transporter.sendMail({
     from: `"SBTech Security" <${process.env.EMAIL_USER}>`,
     to,
@@ -24,5 +21,3 @@ async function sendMail({ to, subject, html }) {
     html,
   });
 }
-
-module.exports = { sendMail };
