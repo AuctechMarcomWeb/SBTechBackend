@@ -1,9 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import express from 'express';
-import cors from 'cors';
-import scanRoute from './routes/scan.js';
+
+import express    from 'express';
+import cors       from 'cors';
+import { connectDB } from './config/db.js';
+
+import scanRoute     from './routes/scan.js';
 import registerRoute from './routes/register.js';
+import adminRoute    from './routes/admin.js';
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -16,10 +20,13 @@ app.use(express.json());
 app.get('/', (_req, res) => res.json({ status: 'SBTech Backend Running ✅' }));
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-app.use('/api', scanRoute);
-app.use('/api', registerRoute);
+app.use('/api',       scanRoute);
+app.use('/api',       registerRoute);
+app.use('/api/admin', adminRoute);
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, '0.0.0.0', () =>
-  console.log(`✅  SBTech backend running on port ${PORT}`)
-);
+// ── Connect DB → Start server ─────────────────────────────────────────────────
+connectDB().then(() => {
+  app.listen(PORT, '0.0.0.0', () =>
+    console.log(`✅  SBTech backend running on port ${PORT}`)
+  );
+});
