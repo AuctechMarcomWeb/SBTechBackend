@@ -13,20 +13,32 @@ export async function registerLead(req, res) {
 
     await Lead.create({ firstName, lastName, email, company, phone, role, challenge, domain, risk, findings: findings || [] });
 
-    // Send emails — non-blocking, failure won't break the response
-    sendMail({
-      to:      email,
-      subject: `Welcome to SBTech — Your Security Report is Ready`,
-      html:    welcomeEmailToUser({ firstName, lastName, domain, risk, findings }),
-    }).catch(err => console.error('Welcome mail failed (non-fatal):', err.message));
+    // Send emails sequentially to avoid SMTP rate limiting
+    const emailResults = { userMail: false, alertMail: false };
 
-    sendMail({
-      to:      process.env.SBTECH_EMAIL,
-      subject: `🚨 New Lead — ${company || firstName} (${domain || 'No domain'}) — ${risk || 'N/A'}`,
-      html:    registerAlertToSBTech({ firstName, lastName, email, company, phone, role, challenge, domain, risk, findings }),
-    }).catch(err => console.error('Alert mail failed (non-fatal):', err.message));
+    try {
+      await sendMail({
+        to:      email,
+        subject: `Welcome to SBTech — Your Security Report is Ready`,
+        html:    welcomeEmailToUser({ firstName, lastName, domain, risk, findings }),
+      });
+      emailResults.userMail = true;
+    } catch (err) {
+      console.error('Welcome mail failed:', err.message);
+    }
 
-    res.json({ success: true, message: 'Lead saved and emails sent' });
+    try {
+      await sendMail({
+        to:      process.env.SBTECH_EMAIL,
+        subject: `🚨 New Lead — ${company || firstName} (${domain || 'No domain'}) — ${risk || 'N/A'}`,
+        html:    registerAlertToSBTech({ firstName, lastName, email, company, phone, role, challenge, domain, risk, findings }),
+      });
+      emailResults.alertMail = true;
+    } catch (err) {
+      console.error('Alert mail failed:', err.message);
+    }
+
+    res.json({ success: true, message: 'Lead saved and emails sent', emailResults });
   } catch (err) {
     console.error('Register error:', err.message);
     res.status(500).json({ success: false, message: err.message });
