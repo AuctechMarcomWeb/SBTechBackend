@@ -13,17 +13,18 @@ export async function registerLead(req, res) {
 
     await Lead.create({ firstName, lastName, email, company, phone, role, challenge, domain, risk, findings: findings || [] });
 
-    await sendMail({
+    // Send emails — non-blocking, failure won't break the response
+    sendMail({
       to:      email,
       subject: `Welcome to SBTech — Your Security Report is Ready`,
       html:    welcomeEmailToUser({ firstName, lastName, domain, risk, findings }),
-    });
+    }).catch(err => console.error('Welcome mail failed (non-fatal):', err.message));
 
-    await sendMail({
+    sendMail({
       to:      process.env.SBTECH_EMAIL,
       subject: `🚨 New Lead — ${company || firstName} (${domain || 'No domain'}) — ${risk || 'N/A'}`,
       html:    registerAlertToSBTech({ firstName, lastName, email, company, phone, role, challenge, domain, risk, findings }),
-    });
+    }).catch(err => console.error('Alert mail failed (non-fatal):', err.message));
 
     res.json({ success: true, message: 'Lead saved and emails sent' });
   } catch (err) {

@@ -9,11 +9,12 @@ export async function createScan(req, res) {
 
     await Scan.create({ domain, risk, findings: findings || [] });
 
-    await sendMail({
+    // Send alert email — non-blocking, failure won't break the response
+    sendMail({
       to:      process.env.SBTECH_EMAIL,
       subject: `🔍 New Security Scan — ${domain} | ${risk || 'Result Pending'}`,
       html:    scanAlertToSBTech({ domain, risk, findings }),
-    });
+    }).catch(err => console.error('Mail send failed (non-fatal):', err.message));
 
     res.json({ success: true, message: 'Scan saved and alert sent' });
   } catch (err) {
